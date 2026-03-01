@@ -1,7 +1,7 @@
 # KambioP2P - Frontend
 
 **Created with:** GitHub Copilot  
-**Creation Date:** February 24, 2026
+**Creation Date:** February, 2026
 
 ## Description
 
