@@ -1,0 +1,101 @@
+service: kambiop2p-users
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  iam:
+    role: LabRole
+  environment:
+    USERS_TABLE: ${self:service}-${self:provider.stage}-users
+    PROFILES_TABLE: ${self:service}-${self:provider.stage}-profiles
+    REPUTATION_TABLE: ${self:service}-${self:provider.stage}-reputation
+
+functions:
+  register:
+    handler: handler.register
+    events:
+      - http:
+          path: auth/register
+          method: post
+          cors: true
+
+  login:
+    handler: handler.login
+    events:
+      - http:
+          path: auth/login
+          method: post
+          cors: true
+
+  verifyIdentity:
+    handler: handler.verify_identity
+    events:
+      - http:
+          path: user/verify-identity
+          method: post
+          cors: true
+
+  getProfile:
+    handler: handler.get_profile
+    events:
+      - http:
+          path: user/profile/{id}
+          method: get
+          cors: true
+
+  updateReputation:
+    handler: handler.update_reputation
+    events:
+      - http:
+          path: user/reputation
+          method: patch
+          cors: true
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USERS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: UserIdIndex
+            KeySchema:
+              - AttributeName: id
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+
+    ProfilesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.PROFILES_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: user_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: user_id
+            KeyType: HASH
+
+    ReputationTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.REPUTATION_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: user_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: user_id
+            KeyType: HASH

@@ -1,0 +1,87 @@
+service: kambiop2p-market
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  iam:
+    role: LabRole
+  environment:
+    OFFERS_TABLE: ${self:service}-${self:provider.stage}-offers
+    EXTERNAL_RATES_TABLE: ${self:service}-${self:provider.stage}-external-rates
+
+functions:
+  getOffers:
+    handler: handler.get_offers
+    events:
+      - http:
+          path: offers
+          method: get
+          cors: true
+
+  createOffer:
+    handler: handler.create_offer
+    events:
+      - http:
+          path: offers/create
+          method: post
+          cors: true
+
+  deleteOffer:
+    handler: handler.delete_offer
+    events:
+      - http:
+          path: offers/{id}
+          method: delete
+          cors: true
+
+  getMarketRates:
+    handler: handler.get_market_rates
+    events:
+      - http:
+          path: market/rates
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    OffersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.OFFERS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: user_id
+            AttributeType: S
+          - AttributeName: created_at
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: UserOffersIndex
+            KeySchema:
+              - AttributeName: user_id
+                KeyType: HASH
+              - AttributeName: created_at
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+    ExternalRatesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.EXTERNAL_RATES_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true

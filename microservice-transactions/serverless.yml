@@ -1,0 +1,120 @@
+service: kambiop2p-transactions
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  iam:
+    role: LabRole
+  environment:
+    TRADES_TABLE: ${self:service}-${self:provider.stage}-trades
+    BANK_ACCOUNTS_TABLE: ${self:service}-${self:provider.stage}-bank-accounts
+    OFFERS_TABLE: kambiop2p-market-${self:provider.stage}-offers
+
+functions:
+  initiateTrade:
+    handler: handler.initiate_trade
+    events:
+      - http:
+          path: trades/initiate
+          method: post
+          cors: true
+
+  confirmDeposit:
+    handler: handler.confirm_deposit
+    events:
+      - http:
+          path: trades/{id}/confirm-deposit
+          method: post
+          cors: true
+
+  releaseFunds:
+    handler: handler.release_funds
+    events:
+      - http:
+          path: trades/{id}/release-funds
+          method: post
+          cors: true
+
+  getBankAccounts:
+    handler: handler.get_bank_accounts
+    events:
+      - http:
+          path: trades/bank-accounts
+          method: get
+          cors: true
+
+  addBankAccount:
+    handler: handler.add_bank_account
+    events:
+      - http:
+          path: trades/bank-accounts
+          method: post
+          cors: true
+
+  getUserTrades:
+    handler: handler.get_user_trades
+    events:
+      - http:
+          path: trades/user
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    TradesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TRADES_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: buyer_id
+            AttributeType: S
+          - AttributeName: seller_id
+            AttributeType: S
+          - AttributeName: created_at
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: BuyerTradesIndex
+            KeySchema:
+              - AttributeName: buyer_id
+                KeyType: HASH
+              - AttributeName: created_at
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: SellerTradesIndex
+            KeySchema:
+              - AttributeName: seller_id
+                KeyType: HASH
+              - AttributeName: created_at
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+    BankAccountsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.BANK_ACCOUNTS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: user_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: UserAccountsIndex
+            KeySchema:
+              - AttributeName: user_id
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
