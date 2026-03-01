@@ -8,7 +8,9 @@ provider:
   region: us-east-1
   stage: ${opt:stage, 'dev'}
   iam:
-    arn:aws:iam::${aws:accountId}:role/LabRole
+    role: arn:aws:iam::${aws:accountId}:role/LabRole
+  httpApi:
+    cors: true
   environment:
     OFFERS_TABLE: ${self:service}-${self:provider.stage}-offers
     EXTERNAL_RATES_TABLE: ${self:service}-${self:provider.stage}-external-rates

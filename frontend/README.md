@@ -185,7 +185,9 @@ This configuration uses the existing `LabRole` IAM role instead of creating new 
 ```yaml
 provider:
   iam:
-    arn:aws:iam::${aws:accountId}:role/LabRole
+    role: arn:aws:iam::${aws:accountId}:role/LabRole
+  httpApi:
+    cors: true
 ```
 
 ### Post-Deployment
