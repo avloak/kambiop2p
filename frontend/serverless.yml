@@ -14,7 +14,7 @@ custom:
   siteName: kambiop2p-frontend-${self:provider.stage}
   s3Sync:
     - bucketName: ${self:custom.siteName}
-      localDir: src
+      localDir: build
 
 resources:
   Resources:
