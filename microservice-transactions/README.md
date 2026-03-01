@@ -263,7 +263,7 @@ The `serverless.yml` file is configured to use the existing `LabRole` IAM role:
 ```yaml
 provider:
   iam:
-    role: LabRole
+    arn:aws:iam::${aws:accountId}:role/LabRole
 ```
 
 ## Deployment

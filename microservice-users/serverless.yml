@@ -1,3 +1,5 @@
+org: testeocloudcomputing
+app: kambiop2p
 service: kambiop2p-users
 
 provider:
@@ -6,7 +8,7 @@ provider:
   region: us-east-1
   stage: ${opt:stage, 'dev'}
   iam:
-    role: LabRole
+    arn:aws:iam::${aws:accountId}:role/LabRole
   environment:
     USERS_TABLE: ${self:service}-${self:provider.stage}-users
     PROFILES_TABLE: ${self:service}-${self:provider.stage}-profiles

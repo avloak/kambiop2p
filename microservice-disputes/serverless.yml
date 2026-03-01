@@ -1,3 +1,5 @@
+org: testeocloudcomputing
+app: kambiop2p
 service: kambiop2p-disputes
 
 provider:
@@ -6,7 +8,7 @@ provider:
   region: us-east-1
   stage: ${opt:stage, 'dev'}
   iam:
-    role: LabRole
+    arn:aws:iam::${aws:accountId}:role/LabRole
   environment:
     DISPUTES_TABLE: ${self:service}-${self:provider.stage}-disputes
     TRADES_TABLE: kambiop2p-transactions-${self:provider.stage}-trades
