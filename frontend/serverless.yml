@@ -9,20 +9,19 @@ provider:
   stage: ${opt:stage, 'dev'}
   iam:
     role: arn:aws:iam::${aws:accountId}:role/LabRole
-  httpApi:
-    cors: true
 
 custom:
+  siteName: kambiop2p-frontend-${self:provider.stage}
   s3Sync:
-    - bucketName: kambiop2p-frontend-${self:provider.stage}
-      localDir: build
+    - bucketName: ${self:custom.siteName}
+      localDir: src
 
 resources:
   Resources:
     WebsiteBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: kambiop2p-frontend-${self:provider.stage}
+        BucketName: ${self:custom.siteName}
         WebsiteConfiguration:
           IndexDocument: index.html
           ErrorDocument: index.html
@@ -36,7 +35,7 @@ resources:
       Type: AWS::S3::BucketPolicy
       Properties:
         Bucket:
-          Ref: WebsiteBucket
+          Ref: ${self:custom.siteName}
         PolicyDocument:
           Statement:
             - Sid: PublicReadGetObject
@@ -44,12 +43,7 @@ resources:
               Principal: "*"
               Action:
                 - s3:GetObject
-              Resource:
-                Fn::Join:
-                  - ""
-                  - - "arn:aws:s3:::"
-                    - Ref: WebsiteBucket
-                    - "/*"
+              Resource: arn:aws:s3:::${self:custom.siteName}/*
 
   Outputs:
     WebsiteURL:
