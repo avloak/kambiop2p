@@ -1,13 +1,13 @@
-import api from './api';
+import usersApi from './api';
 
 export const authService = {
   register: async (userData) => {
-    const response = await api.post('/auth/register', userData);
+    const response = await usersApi.post('/auth/register', userData);
     return response.data;
   },
 
   login: async (email, password) => {
-    const response = await api.post('/auth/login', { email, password });
+    const response = await usersApi.post('/auth/login', { email, password });
     if (response.data.token) {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('userId', response.data.userId);
@@ -16,7 +16,7 @@ export const authService = {
   },
 
   verifyIdentity: async (formData) => {
-    const response = await api.post('/user/verify-identity', formData, {
+    const response = await usersApi.post('/user/verify-identity', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -32,12 +32,12 @@ export const authService = {
 
 export const userService = {
   getProfile: async (userId) => {
-    const response = await api.get(`/user/profile/${userId}`);
+    const response = await usersApi.get(`/user/profile/${userId}`);
     return response.data;
   },
 
   updateReputation: async (userId, score) => {
-    const response = await api.patch('/user/reputation', { userId, score });
+    const response = await usersApi.patch('/user/reputation', { userId, score });
     return response.data;
   },
 };

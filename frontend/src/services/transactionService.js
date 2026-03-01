@@ -1,13 +1,13 @@
-import api from './api';
+import transactionsApi from './api';
 
 export const transactionService = {
   initiateTrade: async (offerId) => {
-    const response = await api.post('/trades/initiate', { offerId });
+    const response = await transactionsApi.post('/trades/initiate', { offerId });
     return response.data;
   },
 
   confirmDeposit: async (tradeId, proofData) => {
-    const response = await api.post(`/trades/${tradeId}/confirm-deposit`, proofData, {
+    const response = await transactionsApi.post(`/trades/${tradeId}/confirm-deposit`, proofData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -16,22 +16,22 @@ export const transactionService = {
   },
 
   releaseFunds: async (tradeId) => {
-    const response = await api.post(`/trades/${tradeId}/release-funds`);
+    const response = await transactionsApi.post(`/trades/${tradeId}/release-funds`);
     return response.data;
   },
 
   getBankAccounts: async () => {
-    const response = await api.get('/trades/bank-accounts');
+    const response = await transactionsApi.get('/trades/bank-accounts');
     return response.data;
   },
 
   addBankAccount: async (accountData) => {
-    const response = await api.post('/trades/bank-accounts', accountData);
+    const response = await transactionsApi.post('/trades/bank-accounts', accountData);
     return response.data;
   },
 
   getUserTrades: async () => {
-    const response = await api.get('/trades/user');
+    const response = await transactionsApi.get('/trades/user');
     return response.data;
   },
 };

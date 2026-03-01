@@ -1,20 +1,25 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://api.kambiop2p.com';
+const DISPUTES_API_BASE_URL = 'https://api.kambiop2p.com';
+const MARKET_API_BASE_URL = 'https://api.kambiop2p.com';
+const TRANSACTIONS_API_BASE_URL = 'https://api.kambiop2p.com';
+const USERS_API_BASE_URL = 'https://api.kambiop2p.com';
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+export const disputesApi = axios.create({ baseURL: DISPUTES_API_BASE_URL, headers: { 'Content-Type': 'application/json',}, });
+export const marketApi = axios.create({ baseURL: MARKET_API_BASE_URL, headers: { 'Content-Type': 'application/json',}, });
+export const transactionsApi = axios.create({ baseURL: TRANSACTIONS_API_BASE_URL, headers: { 'Content-Type': 'application/json',}, });
+export const usersApi = axios.create({ baseURL: USERS_API_BASE_URL, headers: { 'Content-Type': 'application/json',}, });
+
+// Group the instances that require auth
+const authenticatedServices = [transactionsApi, disputesApi];
+
+// Apply the interceptor to all of them at once
+authenticatedServices.forEach((instance) => {
+  instance.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
 });
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-export default api;

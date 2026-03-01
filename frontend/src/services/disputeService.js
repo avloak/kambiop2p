@@ -1,4 +1,4 @@
-import api from './api';
+import disputesApi from './api';
 
 export const disputeService = {
   openDispute: async (tradeId, reason, evidence) => {
@@ -9,7 +9,7 @@ export const disputeService = {
       formData.append('evidence', evidence);
     }
     
-    const response = await api.post('/disputes/open', formData, {
+    const response = await disputesApi.post('/disputes/open', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -18,12 +18,12 @@ export const disputeService = {
   },
 
   getDispute: async (disputeId) => {
-    const response = await api.get(`/disputes/${disputeId}`);
+    const response = await disputesApi.get(`/disputes/${disputeId}`);
     return response.data;
   },
 
   resolveDispute: async (disputeId, resolution) => {
-    const response = await api.post(`/disputes/${disputeId}/resolve`, { resolution });
+    const response = await disputesApi.post(`/disputes/${disputeId}/resolve`, { resolution });
     return response.data;
   },
 };
