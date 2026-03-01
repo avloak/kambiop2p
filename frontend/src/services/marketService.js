@@ -1,4 +1,4 @@
-import marketApi from './api';
+import {marketApi} from './api';
 
 export const marketService = {
   getOffers: async (filters = {}) => {

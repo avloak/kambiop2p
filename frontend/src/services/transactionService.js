@@ -1,4 +1,4 @@
-import transactionsApi from './api';
+import {transactionsApi} from './api';
 
 export const transactionService = {
   initiateTrade: async (offerId) => {

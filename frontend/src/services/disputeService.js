@@ -1,4 +1,4 @@
-import disputesApi from './api';
+import {disputesApi} from './api';
 
 export const disputeService = {
   openDispute: async (tradeId, reason, evidence) => {
